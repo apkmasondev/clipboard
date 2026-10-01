@@ -1,0 +1,17 @@
+node_modules/
+dist/
+src-tauri/target/
+artifacts/
+*.log
+.env*
+.build-cache/
+*.tsbuildinfo
+*.db*
+*.sqlite*
+*.scbackup
+*.pfx
+*.p12
+*.key
+.codex/
+.agents/
+AUDIT.md

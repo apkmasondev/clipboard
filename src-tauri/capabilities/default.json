@@ -1,0 +1,11 @@
+{
+  "identifier": "default",
+  "description": "Local interface; filesystem and clipboard stay in Rust.",
+  "windows": ["main", "quick"],
+  "permissions": [
+    "core:default",
+    "core:window:allow-hide",
+    "core:window:allow-show",
+    "core:window:allow-set-focus"
+  ]
+}

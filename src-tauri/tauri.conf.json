@@ -1,0 +1,79 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Super Clipboard",
+  "version": "1.1.0",
+  "identifier": "pl.superclipboard.desktop",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://localhost:1420",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "Super Clipboard",
+        "width": 1240,
+        "height": 800,
+        "minWidth": 960,
+        "minHeight": 620,
+        "visible": false,
+        "backgroundColor": "#15191e"
+      },
+      {
+        "label": "quick",
+        "title": "Super Clipboard — szybkie wklejanie",
+        "url": "index.html?quick=1",
+        "width": 640,
+        "height": 520,
+        "minWidth": 440,
+        "minHeight": 360,
+        "visible": false,
+        "decorations": false,
+        "resizable": false,
+        "alwaysOnTop": true,
+        "skipTaskbar": true,
+        "backgroundColor": "#15191e"
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src ipc: http://ipc.localhost; object-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'"
+    }
+  },
+  "bundle": {
+    "resources": {
+      "../THIRD_PARTY_NOTICES.txt": "THIRD_PARTY_NOTICES.txt",
+      "../LICENSE": "LICENSE"
+    },
+    "active": true,
+    "targets": [
+      "nsis"
+    ],
+    "icon": [
+      "icons/icon.ico",
+      "icons/32x32.png",
+      "icons/128x128.png"
+    ],
+    "shortDescription": "Prywatny schowek i biblioteka snippetów",
+    "category": "Productivity",
+    "windows": {
+      "nsis": {
+        "customLanguageFiles": {
+          "Polish": "Polish.nsh"
+        },
+        "installerHooks": "installer-hooks.nsh",
+        "installMode": "currentUser",
+        "languages": [
+          "Polish",
+          "English"
+        ],
+        "displayLanguageSelector": false
+      },
+      "webviewInstallMode": {
+        "type": "downloadBootstrapper"
+      }
+    },
+    "licenseFile": "../LICENSE"
+  }
+}
