@@ -27,7 +27,10 @@ jobs:
       - name: Install frontend dependencies
         run: npm ci
       - name: Rust toolchain
-        run: rustup toolchain install stable --profile minimal --component clippy,rustfmt
+        run: |
+          rustup toolchain install 1.96.0 --profile minimal --component clippy,rustfmt
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          rustup default 1.96.0
       - name: Frontend tests
         run: npm test
       - name: Frontend types and build
