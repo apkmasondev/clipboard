@@ -519,6 +519,42 @@ small,
   min-width: 0;
   flex: 1;
 }
+.image-thumbnail {
+  width: 84px;
+  height: 62px;
+  flex: 0 0 84px;
+  align-self: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  background-color: var(--bg);
+  background-image: conic-gradient(
+    var(--raised) 25%,
+    transparent 0 50%,
+    var(--raised) 0 75%,
+    transparent 0
+  );
+  background-size: 12px 12px;
+}
+.image-thumbnail img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.thumbnail-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  color: var(--muted);
+  font-size: 11px;
+  text-align: center;
+  padding: 8px;
+}
 .entry-top {
   display: flex;
   align-items: center;
@@ -1184,6 +1220,67 @@ small,
 }
 .quick .entries {
   padding: 0 14px;
+}
+.quick-results {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+.quick-results > .list-scroll {
+  min-width: 0;
+}
+.quick-image-detail {
+  width: 34%;
+  flex-shrink: 0;
+  border-left: 1px solid var(--border);
+  padding: 14px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow: auto;
+}
+.quick-image-detail .large {
+  width: 100%;
+  height: auto;
+  min-height: 40px;
+  flex: 1;
+}
+.quick-image-size {
+  font-size: 11px;
+  text-align: center;
+  color: var(--text);
+}
+.quick-image-detail > .muted {
+  font-size: 10px;
+  text-align: center;
+}
+.quick .image-thumbnail:not(.large) {
+  width: 64px;
+  height: 48px;
+  flex-basis: 64px;
+}
+.quick .with-preview .entry {
+  gap: 9px;
+  padding-inline: 8px;
+}
+.quick .with-preview .entries {
+  padding-inline: 7px;
+}
+.quick .with-preview .enter-hint {
+  padding: 0;
+}
+@media (max-width: 520px) {
+  .quick .with-preview .image-thumbnail:not(.large) {
+    width: 48px;
+    flex-basis: 48px;
+  }
+  .quick .with-preview .entry-meta {
+    flex-wrap: wrap;
+    gap: 2px;
+  }
+  .quick-image-detail {
+    padding-inline: 8px;
+  }
 }
 .quick .entry {
   min-height: 76px;

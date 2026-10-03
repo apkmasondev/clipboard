@@ -42,6 +42,8 @@ export interface Summary {
   source: string;
   shortcut: string;
   isTemplate: boolean;
+  width: number;
+  height: number;
 }
 export interface Settings {
   theme: 'system' | 'light' | 'dark';

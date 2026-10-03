@@ -12,6 +12,7 @@ export const api = {
   backup: (password: string, restore: boolean) =>
     invoke<number | null>('backup_library', { password, restore }),
   image: (id: string) => invoke<string>('get_image', { id }),
+  thumbnail: (id: string) => invoke<string>('get_thumbnail', { id }),
   copy: (id: string, plain: string | null = null, paste = false) =>
     invoke<void>('copy_entry', { id, plain, paste }),
   pin: (id: string) => invoke<void>('pin_entry', { id }),

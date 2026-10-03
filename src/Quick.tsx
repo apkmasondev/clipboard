@@ -6,7 +6,9 @@ import type { Entry, Page, Settings } from './types';
 import { TemplateComposer } from './components/TemplateComposer';
 import { useDebounce, useEvent, useTheme } from './hooks';
 import { EntryList } from './components/EntryList';
+import { ImagePreview, usePreviewCacheLifecycle } from './components/ImagePreview';
 export function Quick() {
+  usePreviewCacheLifecycle();
   const [query, setQuery] = useState('');
   const q = useDebounce(query, 80);
   const [page, setPage] = useState<Page>({ items: [], total: 0 });
@@ -166,35 +168,49 @@ export function Quick() {
           {error}
         </div>
       ) : null}
-      <EntryList
-        items={page.items}
-        selected={selected?.id || null}
-        onSelect={(id) => setIndex(page.items.findIndex((e) => e.id === id))}
-        onActivate={(id) => void paste(id)}
-        query={query}
-        total={page.total}
-        onMore={async () => {
-          const epoch = queryEpoch.current;
-          setLoading(true);
-          try {
-            const more = await api.query(q, tab, '', 'recent', page.items.length);
-            if (epoch === queryEpoch.current)
-              setPage((old) => ({
-                items: [
-                  ...old.items,
-                  ...more.items.filter((e) => !old.items.some((o) => o.id === e.id)),
-                ],
-                total: more.total,
-              }));
-          } catch (e) {
-            setError(errorText(e));
-          } finally {
-            if (epoch === queryEpoch.current) setLoading(false);
-          }
-        }}
-        loading={loading}
-        quick
-      />
+      <div className={`quick-results ${selected?.kind === 'image' ? 'with-preview' : ''}`}>
+        <EntryList
+          items={page.items}
+          selected={selected?.id || null}
+          onSelect={(id) => setIndex(page.items.findIndex((e) => e.id === id))}
+          onActivate={(id) => void paste(id)}
+          query={query}
+          total={page.total}
+          onMore={async () => {
+            const epoch = queryEpoch.current;
+            setLoading(true);
+            try {
+              const more = await api.query(q, tab, '', 'recent', page.items.length);
+              if (epoch === queryEpoch.current)
+                setPage((old) => ({
+                  items: [
+                    ...old.items,
+                    ...more.items.filter((e) => !old.items.some((o) => o.id === e.id)),
+                  ],
+                  total: more.total,
+                }));
+            } catch (e) {
+              setError(errorText(e));
+            } finally {
+              if (epoch === queryEpoch.current) setLoading(false);
+            }
+          }}
+          loading={loading}
+          quick
+        />
+        {selected?.kind === 'image' ? (
+          <aside className="quick-image-detail" aria-label="Podgląd wybranego obrazu">
+            <span className="eyebrow">PODGLĄD OBRAZU</span>
+            <ImagePreview key={selected.id} id={selected.id} title={selected.title} large />
+            <span className="quick-image-size">
+              {selected.width && selected.height
+                ? `${selected.width} × ${selected.height} px`
+                : 'Obraz'}
+            </span>
+            <span className="muted">Enter — wklej oryginał</span>
+          </aside>
+        ) : null}
+      </div>
       <footer className="quick-footer">
         <span>
           <kbd>↑</kbd>

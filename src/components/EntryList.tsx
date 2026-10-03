@@ -1,8 +1,9 @@
 import { Pin, ArrowDownToLine, Search, ClipboardList } from 'lucide-react';
 import type { Summary } from '../types';
 import { kinds } from '../types';
-import { time } from '../api';
+import { size, time } from '../api';
 import { KindIcon } from './Icons';
+import { ImagePreview } from './ImagePreview';
 export function EntryList({
   items,
   selected,
@@ -57,13 +58,21 @@ export function EntryList({
             onClick={() => onSelect(item.id)}
             onDoubleClick={() => onActivate(item.id)}
           >
-            <KindIcon kind={item.kind} />
+            {item.kind === 'image' ? (
+              <ImagePreview id={item.id} title={item.title} />
+            ) : (
+              <KindIcon kind={item.kind} />
+            )}
             <span className="entry-body">
               <span className="entry-top">
                 <strong>{item.title || 'Bez tytułu'}</strong>
                 {item.pinned ? <Pin size={13} aria-label="Przypięty" /> : null}
               </span>
-              <span className="entry-preview">{item.preview || kinds[item.kind]}</span>
+              <span className="entry-preview">
+                {item.kind === 'image'
+                  ? `${item.width && item.height ? `${item.width} × ${item.height} px · ` : ''}${size(item.bytes)}`
+                  : item.preview || kinds[item.kind]}
+              </span>
               <span className="entry-meta">
                 <span>
                   {item.library ? (

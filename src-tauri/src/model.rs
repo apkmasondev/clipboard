@@ -60,6 +60,8 @@ pub struct Summary {
     pub source: String,
     pub shortcut: String,
     pub is_template: bool,
+    pub width: u32,
+    pub height: u32,
 }
 impl From<Entry> for Summary {
     fn from(e: Entry) -> Self {
@@ -78,6 +80,8 @@ impl From<Entry> for Summary {
             source: e.content.source,
             shortcut: e.content.shortcut,
             is_template: e.content.is_template,
+            width: e.content.width,
+            height: e.content.height,
         }
     }
 }

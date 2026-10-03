@@ -4,6 +4,7 @@ mod model;
 mod privacy;
 mod store;
 mod templates;
+mod thumbnails;
 mod windows;
 
 use model::*;
@@ -23,6 +24,8 @@ pub struct AppState {
     target: Mutex<(isize, u32)>,
     pasting: AtomicBool,
     warnings: Mutex<Vec<String>>,
+    // Serialize image decoding across both windows; never hold the store lock while resizing.
+    thumbnail_worker: Mutex<()>,
 }
 fn locked<'a>(
     s: &'a tauri::State<'_, AppState>,
@@ -216,6 +219,33 @@ async fn get_image(state: tauri::State<'_, AppState>, id: String) -> Result<Stri
         "data:image/png;base64,{}",
         base64::engine::general_purpose::STANDARD.encode(s.image(&id)?)
     ))
+}
+#[tauri::command]
+async fn get_thumbnail(app: tauri::AppHandle, id: String) -> Result<String> {
+    tauri::async_runtime::spawn_blocking(move || {
+        use base64::Engine;
+        let state = app.state::<AppState>();
+        let _worker = state
+            .thumbnail_worker
+            .lock()
+            .map_err(|_| "Podgląd jest niedostępny.")?;
+        let bytes = {
+            let store = locked(&state)?;
+            if store.get(&id)?.kind != "image" {
+                return Err("To nie jest obraz.".into());
+            }
+            store.image(&id)?
+        };
+        let preview = thumbnails::create(&bytes)?;
+        // A deletion or retention cleanup can happen during decoding.
+        locked(&state)?.get(&id)?;
+        Ok(format!(
+            "data:image/png;base64,{}",
+            base64::engine::general_purpose::STANDARD.encode(preview)
+        ))
+    })
+    .await
+    .map_err(|_| "Nie można przygotować podglądu obrazu.".to_string())?
 }
 #[tauri::command]
 async fn copy_entry(
@@ -611,6 +641,7 @@ pub fn run() {
                 target: Mutex::new((0, 0)),
                 pasting: AtomicBool::new(false),
                 warnings: Mutex::new(vec![]),
+                thumbnail_worker: Mutex::new(()),
             });
             if let Err(e) = apply_shortcuts(app.handle(), plan) {
                 app.state::<AppState>()
@@ -686,6 +717,7 @@ pub fn run() {
             get_revision,
             backup_library,
             get_image,
+            get_thumbnail,
             copy_entry,
             pin_entry,
             tag_entry,

@@ -82,6 +82,53 @@ let settings = {
   autostart: false,
   quickShortcut: 'Control+Shift+KeyV',
 };
+// Synthetic, public images for visual regression checks; never read the user's clipboard.
+const imageSamples = new Map<string, string>();
+if (new URLSearchParams(location.search).has('images')) {
+  entries = Array.from({ length: 16 }, (_, index): Entry => {
+    const id = `f30d29b8-7059-4579-85b4-${String(index).padStart(12, '0')}`;
+    const canvas = document.createElement('canvas');
+    canvas.width = index % 3 === 1 ? 180 : 512;
+    canvas.height = index % 3 === 2 ? 160 : 320;
+    const ctx = canvas.getContext('2d')!;
+    if (index % 3 !== 2) {
+      ctx.fillStyle = ['#173b42', '#decaa8', '#e5ded0', '#485464'][index % 4];
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+    ctx.fillStyle = ['#84d4bb', '#1d3341', '#ad7045', '#e4ceb0'][index % 4];
+    ctx.fillRect(20, 24, canvas.width - 40, 18);
+    ctx.beginPath();
+    ctx.arc(
+      canvas.width / 2,
+      canvas.height / 2 + 18,
+      Math.min(canvas.width, canvas.height) / 4,
+      0,
+      Math.PI * 2,
+    );
+    ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 38px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(String(index + 1).padStart(2, '0'), canvas.width / 2, canvas.height / 2 + 30);
+    imageSamples.set(id, canvas.toDataURL('image/png'));
+    return {
+      id,
+      kind: 'image',
+      library: false,
+      pinned: index === 0,
+      created: Date.now() - index * 60000,
+      updated: Date.now() - index * 60000,
+      bytes: 45000 + index * 9000,
+      content: {
+        ...emptyContent(),
+        title: `Obraz · ${canvas.width} × ${canvas.height}`,
+        width: canvas.width,
+        height: canvas.height,
+        source: 'mspaint.exe',
+      },
+    };
+  });
+}
 mockIPC((cmd, args) => {
   const a = args as Record<string, unknown>;
   switch (cmd) {
@@ -91,7 +138,20 @@ mockIPC((cmd, args) => {
       settings = a.settings as typeof settings;
       return;
     case 'get_stats':
-      return { history: 3, snippets: 1, pinned: 1, bytes: 920, diskBytes: 49152 };
+      return {
+        history: entries.filter((e) => !e.library).length,
+        snippets: entries.filter((e) => e.library).length,
+        pinned: 1,
+        bytes: 920,
+        diskBytes: 49152,
+      };
+    case 'get_thumbnail':
+    case 'get_image':
+      if (String(a.id).endsWith('000000000015'))
+        return Promise.reject('Przykładowy błąd odczytu obrazu.');
+      return new Promise((resolve) =>
+        setTimeout(() => resolve(imageSamples.get(String(a.id))), 100),
+      );
     case 'get_warnings':
       return [];
     case 'query_entries': {

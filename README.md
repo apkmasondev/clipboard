@@ -6,7 +6,7 @@ Bezpłatny także w pracy zawodowej. Sprzedaż aplikacji i jej przeróbek jest z
 
 ## Instalacja
 
-Pobierz instalator `Super Clipboard_1.1.0_x64-setup.exe` z [wydań projektu](https://github.com/apkmasondev/clipboard/releases). Instalator działa dla bieżącego użytkownika, zawiera polski interfejs, deinstalator oraz opcjonalny skrót na pulpicie. Aplikacja wymaga Microsoft Edge WebView2 Runtime. Jest zwykle obecny na Windows 11; gdy go brakuje, instalator pobiera oficjalny bootstrapper Microsoft. Sama aplikacja nie wysyła treści schowka ani nie korzysta z sieci.
+Pobierz instalator `Super Clipboard_1.1.1_x64-setup.exe` z [wydań projektu](https://github.com/apkmasondev/clipboard/releases). Instalator działa dla bieżącego użytkownika, zawiera polski interfejs, deinstalator oraz opcjonalny skrót na pulpicie. Aplikacja wymaga Microsoft Edge WebView2 Runtime. Jest zwykle obecny na Windows 11; gdy go brakuje, instalator pobiera oficjalny bootstrapper Microsoft. Sama aplikacja nie wysyła treści schowka ani nie korzysta z sieci.
 
 Wydanie nie ma podpisu Authenticode: w projekcie nie ma certyfikatu wydawcy. Windows może wyświetlić ostrzeżenie o nieznanym wydawcy. Sumy kontrolne są dołączane do wydania jako `SHA256SUMS.txt`; nie zastępują podpisu. Szczegóły: [SIGNING.md](SIGNING.md).
 
@@ -15,6 +15,7 @@ Automatyczne testy obejmują magazyn, migracje, prywatność, obrazy, retencję,
 ## Codzienna praca
 
 - Kopiuj tekst, linki, JSON, kod, kolory, ścieżki, obrazy lub listy plików w innych aplikacjach. Historia reaguje na zmiany schowka.
+- Obrazy mają miniatury na liście oraz wymiary i rozmiar pliku. Popup pokazuje większy podgląd wybranego obrazu. Przezroczystość widać na szachownicy; Enter wkleja oryginał, nie miniaturę. Dotyczy to obrazów zapisanych w schowku, a nie list ścieżek plików kopiowanych w Eksploratorze.
 - **Ctrl+Shift+V** otwiera małe okno przy aktywnej aplikacji. Wpisz frazę, wybierz ↑/↓, naciśnij Enter. Esc zamyka okno. Zakładka Snippety zawęża wyszukiwanie do trwałej biblioteki.
 - W głównym oknie: **Ctrl+F** szuka, **Ctrl+N** tworzy snippet. Enter lub dwuklik na liście kopiuje element. Ctrl+C kopiuje wybrany wpis, jeśli nie edytujesz pola ani nie zaznaczyłeś tekstu.
 - Snippety mają nazwę, kategorię, opis, tagi, ulubione i opcjonalny globalny skrót. Przykłady można zmieniać lub usuwać; po usunięciu nie wracają przy restarcie.
@@ -49,6 +50,8 @@ Domyślnie 2000 nieprzypiętych wpisów, 30 dni i 100 MB zawartości historii. S
 
 Tekst: do 4 MB UTF-8. Obrazy: do 96 MB surowych danych i 24 MB po kompresji PNG. Biblioteka: do 1000 snippetów i 64 MB treści. Import: do 16 MB. Lista pobierana jest stronami po 80 pozycji; podgląd tekstu wyświetla pierwsze 100 000 znaków, ale kopiuje pełną treść.
 
+Miniatury są generowane na żądanie, mieszczą się w 512 × 320 px i istnieją wyłącznie w pamięci. Oryginał pozostaje zaszyfrowany i niezmieniony. Frontend ładuje widoczne wiersze, współdzieli równoczesne żądania i ogranicza cache do 32 podglądów / 4 MiB na okno. Po przewinięciu niewidoczne obrazy są zwalniane z DOM, a oczekujące żądania anulowane. Dekodowanie jest serializowane między oknami i odbywa się poza blokadą magazynu. Nie zmieniono schematu bazy ani formatu kopii zapasowych.
+
 Schowek Windows przechowuje tylko bieżącą wartość. Wpisy nadpisane zanim system dostarczy zdarzenie lub podczas przeciążenia nie zawsze można odzyskać. Kolejka zdjęć schowka ma stały limit pamięci; jej przepełnienie jest sygnalizowane. Zablokowany schowek jest odczytywany ponownie przez ograniczony czas.
 
 ## Uruchomienie developerskie
@@ -74,7 +77,7 @@ npm run release
 ```
 
 Plik aplikacji: `src-tauri/target/release/super-clipboard.exe`.
-Instalator: `src-tauri/target/release/bundle/nsis/Super Clipboard_1.1.0_x64-setup.exe`.
+Instalator: `src-tauri/target/release/bundle/nsis/Super Clipboard_1.1.1_x64-setup.exe`.
 Formatowanie: `npm run format`. Domyślny build nie włącza debugowania WebView.
 
 GitHub Actions wykonuje testy i buduje niepodpisany instalator Windows. Aktualizacje instaluje się ręcznie. Narzędzia budowania pobierają zależności i narzędzia NSIS; te połączenia nie należą do działającej aplikacji. `node scripts/check-source.mjs` sprawdza śledzone pliki pod kątem niedozwolonych danych. `node scripts/licenses.mjs` odtwarza wykaz licencji z zainstalowanych zależności.

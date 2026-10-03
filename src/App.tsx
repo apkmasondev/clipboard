@@ -25,6 +25,7 @@ import type { Entry, Page, Settings, Stats, View } from './types';
 import { kinds } from './types';
 import { useDebounce, useEvent, useTheme } from './hooks';
 import { EntryList } from './components/EntryList';
+import { usePreviewCacheLifecycle } from './components/ImagePreview';
 import { Detail } from './components/Detail';
 import { SnippetEditor } from './components/SnippetEditor';
 import { SettingsPanel } from './components/SettingsPanel';
@@ -48,6 +49,7 @@ const subtitles: Partial<Record<View, string>> = {
   links: 'Adresy, które chcesz mieć pod ręką.',
 };
 export function App() {
+  usePreviewCacheLifecycle();
   const [view, setView] = useState<View>('history');
   const [query, setQuery] = useState('');
   const q = useDebounce(query);
